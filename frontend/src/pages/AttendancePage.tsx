@@ -3,8 +3,9 @@ import { api, formatINR } from '../services/api';
 import { AttendanceRecord, User } from '../types';
 import {
   Plus, Clock, CheckCircle2, AlertCircle, RefreshCw,
-  Upload, FileSpreadsheet, Check, ArrowRight, Radio, ShieldCheck
+  Upload, FileSpreadsheet, Check, ArrowRight, Radio, ShieldCheck, Camera
 } from 'lucide-react';
+import { FacePunchInModal } from '../components/FacePunchInModal';
 import { toast } from '../components/Toast';
 
 interface AttendancePageProps {
@@ -21,6 +22,7 @@ export const AttendancePage: React.FC<AttendancePageProps> = ({ currentUser }) =
   const [activeTab, setActiveTab] = useState<'muster' | 'logs'>('muster');
   const [syncingTerminal, setSyncingTerminal] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isFacePunchModalOpen, setIsFacePunchModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState('all');
   const [isMarkModalOpen, setIsMarkModalOpen] = useState(false);
   const [markData, setMarkData] = useState({
@@ -219,6 +221,14 @@ export const AttendancePage: React.FC<AttendancePageProps> = ({ currentUser }) =
               <option value="2026-11">November 2026 (Upcoming)</option>
             </select>
           </div>
+
+          <button
+            onClick={() => setIsFacePunchModalOpen(true)}
+            className="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors shadow-sm"
+          >
+            <Camera className="w-4 h-4" />
+            <span>Face Punch-In (AI)</span>
+          </button>
 
           <button
             onClick={handleSyncTerminal}
@@ -613,6 +623,14 @@ export const AttendancePage: React.FC<AttendancePageProps> = ({ currentUser }) =
           </div>
         </div>
       )}
+
+      {/* Google Teachable Machine Face Recognition Punch-In Modal */}
+      <FacePunchInModal
+        isOpen={isFacePunchModalOpen}
+        onClose={() => setIsFacePunchModalOpen(false)}
+        onSuccess={() => loadAttendance()}
+        currentUser={currentUser}
+      />
     </div>
   );
 };

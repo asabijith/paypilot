@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Search, Calculator, ShieldAlert, Users, CalendarCheck,
+  Search, Calculator, Camera, ShieldAlert, Users, CalendarCheck,
   CalendarDays, Receipt, FileBarChart, Settings, Sparkles,
-  Play, Lock, Download, RotateCcw, ArrowRight, UserCheck, Scale, Check
+  Play, Lock, Download, RotateCcw, ArrowRight, UserCheck, Scale, Check,
+  Wallet, Percent, Globe, FileCheck2
 } from 'lucide-react';
 import { User } from '../types';
 
@@ -120,6 +121,41 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       action: () => { onNavigateTab('payslips'); onClose(); }
     },
     {
+      id: 'nav_expenses',
+      category: 'Navigation',
+      title: 'Go to FinOps & Expense Claims',
+      subtitle: 'Section 10 reimbursements, salary advances & bank CMS',
+      icon: Wallet,
+      action: () => { onNavigateTab('expenses'); onClose(); }
+    },
+    {
+      id: 'nav_tax_vault',
+      category: 'Navigation',
+      title: 'Go to Tax Optimization & Form 12BB Vault',
+      subtitle: 'Section 115BAC dual-regime comparator & proof audit',
+      icon: Percent,
+      badge: '115BAC',
+      action: () => { onNavigateTab('tax_vault'); onClose(); }
+    },
+    {
+      id: 'nav_contractors',
+      category: 'Navigation',
+      title: 'Go to Global Contractors Hub',
+      subtitle: 'Multi-currency FX invoices, 194J TDS & SWIFT wires',
+      icon: Globe,
+      badge: 'CROSS-BORDER',
+      action: () => { onNavigateTab('contractors'); onClose(); }
+    },
+    {
+      id: 'nav_compliance',
+      category: 'Navigation',
+      title: 'Go to Statutory Returns & Compliance Vault',
+      subtitle: 'EPFO, ESIC, Section 234E penalty radar & Form 16 / 24Q',
+      icon: FileCheck2,
+      badge: 'CALENDAR',
+      action: () => { onNavigateTab('compliance'); onClose(); }
+    },
+    {
       id: 'nav_reports',
       category: 'Navigation',
       title: 'Go to Statutory Reports',
@@ -137,6 +173,15 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     },
 
     // 2. Fast Actions
+    {
+      id: 'act_face_punch',
+      category: 'Actions',
+      title: 'Face Recognition Punch-In (AI Biometric)',
+      subtitle: 'Google Teachable Machine camera punch-in & instant log',
+      icon: Camera,
+      badge: 'AI CAMERA',
+      action: () => { onNavigateTab('attendance'); onClose(); }
+    },
     {
       id: 'act_audit',
       category: 'Actions',
@@ -206,15 +251,15 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-start justify-center p-4 pt-16 sm:pt-24 animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-md flex items-start justify-center p-4 pt-16 sm:pt-24 animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[75vh]"
+        className="apple-glass rounded-2xl shadow-[0_24px_70px_rgba(0,0,0,0.18)] border border-black/[0.08] w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[75vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Header Input */}
-        <div className="flex items-center px-4 py-3.5 border-b border-slate-200 gap-3 bg-slate-50/50">
+        <div className="flex items-center px-4 py-3.5 border-b border-black/[0.06] gap-3 bg-white/50">
           <Search className="w-4 h-4 text-slate-400 shrink-0" />
           <input
             ref={inputRef}

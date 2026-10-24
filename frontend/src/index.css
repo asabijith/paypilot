@@ -3,20 +3,28 @@
 @layer base {
   :root {
     --primary-navy: #0F172A;
-    --primary-indigo: #4338CA;
-    --border-color: #E2E8F0;
-    --bg-page: #F8FAFC;
+    --primary-indigo: #4F46E5;
+    --apple-blue: #0071E3;
+    --apple-bg: #F5F5F7;
+    --apple-surface: #FFFFFF;
+    --apple-card-border: rgba(0, 0, 0, 0.06);
+    --apple-text-primary: #1D1D1F;
+    --apple-text-secondary: #86868B;
+    --border-color: #E5E5EA;
+    --bg-page: #F5F5F7;
     --bg-surface: #FFFFFF;
   }
 
   body {
-    background-color: #F8FAFC;
-    color: #0F172A;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #F5F5F7;
+    color: #1D1D1F;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Plus Jakarta Sans", "Inter", -apple-system, system-ui, sans-serif;
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.011em;
   }
 
   input, select, textarea, button {
@@ -24,20 +32,84 @@
   }
 }
 
-/* Minimalist scrollbars */
+/* Apple Cupertino Materials & Glassmorphism */
+.apple-glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.apple-glass-dark {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.apple-card {
+  background: #ffffff;
+  border-radius: 1.25rem; /* 20px */
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apple-card:hover {
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.apple-segmented-track {
+  background: #E5E5EA;
+  padding: 3px;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.apple-segmented-btn-active {
+  background: #ffffff;
+  color: #1D1D1F;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.15);
+  border-radius: 0.6rem;
+  font-weight: 600;
+}
+
+.apple-badge-pulse {
+  position: relative;
+}
+.apple-badge-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background: inherit;
+  opacity: 0.4;
+  animation: apple-pulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  z-index: -1;
+}
+
+@keyframes apple-pulse {
+  0% { transform: scale(0.95); opacity: 0.6; }
+  50% { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+/* Minimalist Apple scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
+  background: #D1D1D6;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #8E8E93;
 }
 
 /* Clean Print Styles for Official Payslip */

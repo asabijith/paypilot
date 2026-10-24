@@ -460,3 +460,272 @@ export interface IntelligenceSummary {
   is_employee: boolean;
 }
 
+
+// ==========================================
+// FINOPS & EXPENSE CLAIMS TYPES
+// ==========================================
+
+export interface ExpenseClaim {
+  id: string;
+  company_id: string;
+  employee_id: string;
+  employee_name: string;
+  title: string;
+  category: 'travel' | 'remote_work_internet' | 'client_entertainment' | 'learning_certifications' | 'medical_wellness' | 'general_office';
+  amount: number;
+  currency: string;
+  expense_date: string;
+  status: 'draft' | 'submitted' | 'approved' | 'rejected' | 'reimbursed';
+  tax_treatment: 'tax_free_sec10' | 'taxable_perquisite_sec17';
+  receipt_name: string;
+  merchant_name: string;
+  gstin?: string;
+  policy_violation_flag: boolean;
+  policy_violation_notes?: string;
+  reimbursement_period_id?: string;
+  approved_by?: string;
+  approved_at?: string;
+  rejection_reason?: string;
+  created_at: string;
+}
+
+export interface SalaryAdvance {
+  id: string;
+  company_id: string;
+  employee_id: string;
+  employee_name: string;
+  amount_requested: number;
+  amount_approved: number;
+  reason: string;
+  tenure_months: number;
+  monthly_emi: number;
+  amount_recovered: number;
+  balance_remaining?: number;
+  status: 'pending' | 'approved' | 'active_deduction' | 'fully_recovered' | 'rejected';
+  applied_date: string;
+  approved_by?: string;
+  approved_at?: string;
+  created_at: string;
+}
+
+export interface ExpensesSummary {
+  total_claims_count: number;
+  total_claimed_amount: number;
+  pending_amount: number;
+  approved_pending_reimbursement: number;
+  reimbursed_amount: number;
+  policy_violations_count: number;
+  active_salary_advances_count: number;
+  total_advance_outstanding: number;
+  category_breakdown: Record<string, { count: number; amount: number }>;
+}
+
+// ==========================================
+// TAX VAULT & FORM 12BB TYPES
+// ==========================================
+
+export interface TaxDeclaration {
+  id: string;
+  employee_id: string;
+  employee_name: string;
+  financial_year: string;
+  regime_selected: 'new' | 'old';
+  sec_80c_declared: number;
+  sec_80c_approved: number;
+  sec_80d_health_declared: number;
+  sec_80d_health_approved: number;
+  sec_24b_home_loan_interest_declared: number;
+  sec_24b_home_loan_interest_approved: number;
+  sec_80ccd_nps_declared: number;
+  sec_80ccd_nps_approved: number;
+  hra_annual_rent_declared: number;
+  hra_annual_rent_approved: number;
+  landlord_pan?: string;
+  landlord_name?: string;
+  rental_city_type: 'metro' | 'non_metro';
+  other_exemptions_declared: number;
+  other_exemptions_approved: number;
+  status: 'draft' | 'submitted' | 'verified' | 'locked';
+  verification_notes?: string;
+  verified_by?: string;
+  verified_at?: string;
+  created_at?: string;
+}
+
+export interface TaxRegimeComparisonResult {
+  annual_ctc: number;
+  recommendation: 'new' | 'old';
+  recommendation_reason: string;
+  annual_tax_savings: number;
+  new_regime: {
+    gross_income: number;
+    standard_deduction: number;
+    other_exemptions: number;
+    taxable_income: number;
+    annual_tax: number;
+    monthly_tds: number;
+  };
+  old_regime: {
+    gross_income: number;
+    standard_deduction: number;
+    hra_exemption: number;
+    sec_80c: number;
+    sec_80d: number;
+    sec_24b: number;
+    sec_80ccd: number;
+    total_deductions: number;
+    taxable_income: number;
+    annual_tax: number;
+    monthly_tds: number;
+  };
+}
+
+// ==========================================
+// GLOBAL CONTRACTORS & CROSS-BORDER TYPES
+// ==========================================
+
+export interface Contractor {
+  id: string;
+  company_id: string;
+  contractor_code: string;
+  name: string;
+  email: string;
+  phone: string;
+  country: string;
+  currency: string;
+  contractor_type: 'individual' | 'company';
+  service_type: string;
+  pan_or_tax_id: string;
+  gstin?: string;
+  w8ben_status: 'not_applicable' | 'submitted' | 'verified';
+  withholding_section: string;
+  withholding_rate_pct: number;
+  rate_per_hour_or_month: number;
+  rate_type: 'hourly' | 'fixed_monthly' | 'milestone';
+  bank_name: string;
+  bank_account: string;
+  ifsc_or_swift: string;
+  status: 'active' | 'inactive';
+  created_at: string;
+}
+
+export interface ContractorInvoice {
+  id: string;
+  company_id: string;
+  contractor_id: string;
+  contractor_name?: string;
+  invoice_number: string;
+  invoice_date: string;
+  due_date: string;
+  currency: string;
+  subtotal_amount: number;
+  gst_amount: number;
+  tds_withheld_amount: number;
+  net_payable_amount: number;
+  fx_rate_to_inr: number;
+  net_inr_equivalent: number;
+  description: string;
+  status: 'draft' | 'pending_approval' | 'approved' | 'paid' | 'cancelled';
+  paid_at?: string;
+  payment_reference?: string;
+  created_at: string;
+}
+
+// ==========================================
+// STATUTORY COMPLIANCE & FORM 16 / 24Q TYPES
+// ==========================================
+
+export interface ComplianceFiling {
+  id: string;
+  company_id: string;
+  filing_type: 'epf_ecr' | 'esic_challan' | 'tds_challan_281' | 'pt_return' | 'form_24q';
+  period_label: string;
+  due_date: string;
+  statutory_authority: string;
+  amount_payable: number;
+  status: 'pending' | 'filed_on_time' | 'delayed_filed' | 'overdue';
+  challan_reference?: string;
+  bsr_code?: string;
+  cin_number?: string;
+  filed_at?: string;
+  days_remaining: number;
+  is_overdue: boolean;
+  penalty_info: {
+    days_overdue: number;
+    penalty_amount: number;
+    interest_amount: number;
+    total_statutory_charge: number;
+    statutory_sections: string;
+    risk_severity: 'none' | 'moderate' | 'high' | 'critical';
+  };
+}
+
+export interface ComplianceCalendarResponse {
+  filings: ComplianceFiling[];
+  metrics: {
+    total_filings: number;
+    filed_count: number;
+    upcoming_count: number;
+    overdue_count: number;
+    total_statutory_remitted: number;
+    total_statutory_pending: number;
+    total_penalties_accrued: number;
+    compliance_score_pct: number;
+  };
+}
+
+export interface Form16Data {
+  certificate_id: string;
+  assessment_year: string;
+  financial_year: string;
+  employer: {
+    name: string;
+    address: string;
+    pan: string;
+    tan: string;
+    cit_tds: string;
+  };
+  employee: {
+    id: string;
+    employee_code: string;
+    name: string;
+    pan: string;
+    designation: string;
+    department: string;
+    tax_regime: string;
+  };
+  part_a: {
+    summary_of_tax_deducted_at_source: Array<{
+      quarter: string;
+      receipt_number: string;
+      amount_paid_credited: number;
+      tax_deducted: number;
+      tax_deposited: number;
+      bsr_code: string;
+      challan_cin: string;
+      date_of_deposit: string;
+      status: string;
+    }>;
+    total_tds_deducted: number;
+    total_tds_deposited: number;
+  };
+  part_b: {
+    gross_salary_sec17_1: number;
+    allowances_exempt_sec10: number;
+    balance_gross: number;
+    standard_deduction_sec16_ia: number;
+    tax_on_employment_sec16_iii: number;
+    total_deductions_sec16: number;
+    income_chargeable_under_salaries: number;
+    chapter_via_deductions: {
+      section_80c: number;
+      section_80d: number;
+      section_80ccd_1b: number;
+      section_24b_home_loan: number;
+      total_chapter_via: number;
+    };
+    total_taxable_income: number;
+    total_tax_payable: number;
+    net_tax_refund_or_due: number;
+  };
+}

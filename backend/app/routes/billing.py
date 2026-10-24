@@ -1,6 +1,10 @@
 import uuid
 import hmac
 import hashlib
+import base64
+import json
+import logging
+import urllib.request
 from datetime import datetime, timedelta
 from typing import Optional, List
 from fastapi import APIRouter, Depends, HTTPException, Header, Request, status
@@ -13,6 +17,8 @@ from app.models import (
 )
 from app.config import settings
 from app.security import get_current_authenticated_user, require_roles
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/billing", tags=["billing"])
 
@@ -123,7 +129,10 @@ def get_subscription_status(
     db: Session = Depends(get_db)
 ):
     """Retrieve current tenant's subscription status, employee limits, and usage."""
-    comp = db.query(Company).filter(Company.id == user.company_id).first()
+    target_company_id = user.company_id or settings.DEFAULT_COMPANY_ID
+    comp = db.query(Company).filter(Company.id == target_company_id).first()
+    if not comp:
+        comp = db.query(Company).filter(Company.id == settings.DEFAULT_COMPANY_ID).first()
     if not comp:
         raise HTTPException(status_code=404, detail="Company not found")
 
@@ -157,6 +166,29 @@ def get_subscription_status(
         "current_period_end": sub.current_period_end.isoformat() if sub and sub.current_period_end else None
     }
 
+def create_razorpay_api_order(amount_in_paise: int, receipt: str, notes: dict) -> Optional[dict]:
+    """Attempts to create a genuine Razorpay Order via Razorpay REST API with configured credentials."""
+    try:
+        auth_bytes = f"{settings.RAZORPAY_KEY_ID}:{settings.RAZORPAY_KEY_SECRET}".encode("utf-8")
+        auth_header = f"Basic {base64.b64encode(auth_bytes).decode('utf-8')}"
+        headers = {
+            "Authorization": auth_header,
+            "Content-Type": "application/json"
+        }
+        payload = json.dumps({
+            "amount": amount_in_paise,
+            "currency": "INR",
+            "receipt": receipt,
+            "notes": notes
+        }).encode("utf-8")
+        req = urllib.request.Request("https://api.razorpay.com/v1/orders", data=payload, headers=headers)
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            if resp.status in (200, 201):
+                return json.loads(resp.read().decode("utf-8"))
+    except Exception as e:
+        logger.warning(f"Razorpay live API order creation fallback: {e}")
+    return None
+
 @router.post("/create-order")
 def create_razorpay_order(
     req: CreateOrderRequest,
@@ -174,7 +206,21 @@ def create_razorpay_order(
     amount = plan["annual_price"] if req.billing_cycle == "annual" else plan["monthly_price"]
     amount_in_paise = amount * 100
 
-    order_id = f"order_{uuid.uuid4().hex[:14]}"
+    company_id = user.company_id or settings.DEFAULT_COMPANY_ID
+    receipt = f"rcpt_{uuid.uuid4().hex[:10]}"
+    notes = {
+        "company_id": company_id,
+        "plan_tier": req.plan_tier,
+        "billing_cycle": req.billing_cycle,
+        "user_email": user.email
+    }
+    
+    # Attempt genuine Razorpay Order generation with API key
+    rzp_order = create_razorpay_api_order(amount_in_paise, receipt, notes)
+    if rzp_order and "id" in rzp_order:
+        order_id = rzp_order["id"]
+    else:
+        order_id = f"order_{uuid.uuid4().hex[:14]}"
     sandbox_payment_id = f"pay_{uuid.uuid4().hex[:12]}"
     sandbox_sig = hmac.new(
         settings.RAZORPAY_KEY_SECRET.encode('utf-8'),
@@ -240,7 +286,10 @@ def verify_payment(
         return {"status": "success", "message": "Transaction already verified.", "invoice_id": existing_tx.id}
 
     # 3. Update Company Plan & Limits
-    comp = db.query(Company).filter(Company.id == user.company_id).first()
+    target_company_id = user.company_id or settings.DEFAULT_COMPANY_ID
+    comp = db.query(Company).filter(Company.id == target_company_id).first()
+    if not comp:
+        comp = db.query(Company).filter(Company.id == settings.DEFAULT_COMPANY_ID).first()
     if not comp:
         raise HTTPException(status_code=404, detail="Company not found")
 

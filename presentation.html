@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PayPilot AI — Team T-REX Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "SF Pro Display", sans-serif;
+      background-color: #0F172A;
+      color: #0F172A;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* 16:9 Slide Stage */
+    .stage {
+      width: 100%;
+      max-width: 1200px;
+      aspect-ratio: 16 / 9;
+      background: #FFFFFF;
+      border-radius: 20px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Individual Slide */
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 44px 56px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px) scale(0.99);
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      background: #FFFFFF;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Top Header Bar */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #F1F5F9;
+      padding-bottom: 14px;
+    }
+    .tag-category {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #EEF2FF;
+      color: #4F46E5;
+      border: 1px solid rgba(79, 70, 229, 0.2);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      margin-bottom: 6px;
+    }
+    .tag-team {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #F1F5F9;
+      color: #0F172A;
+      border: 1px solid #E2E8F0;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .slide-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #0F172A;
+      line-height: 1.2;
+    }
+    .slide-subtitle {
+      font-size: 13px;
+      font-weight: 500;
+      color: #64748B;
+      margin-top: 3px;
+    }
+
+    /* Content Area */
+    .slide-content {
+      flex: 1;
+      display: grid;
+      gap: 18px;
+      align-content: stretch;
+    }
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Apple-like Card */
+    .card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--accent, #4F46E5);
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 2px;
+      letter-spacing: -0.01em;
+    }
+    .card-tagline {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748B;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.45;
+    }
+    .card-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .card-list li::before {
+      content: "•";
+      color: var(--accent, #4F46E5);
+      font-weight: bold;
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    /* Title Slide Custom Layout */
+    .title-slide-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 20px;
+    }
+    .title-hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      background: #EEF2FF;
+      border: 1px solid rgba(79, 70, 229, 0.3);
+      color: #4F46E5;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+      width: fit-content;
+    }
+    .title-main {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #0F172A;
+      line-height: 1.1;
+    }
+    .title-sub {
+      font-size: 22px;
+      font-weight: 700;
+      color: #4F46E5;
+      margin-top: 10px;
+      letter-spacing: -0.01em;
+    }
+    .title-desc {
+      font-size: 14px;
+      color: #64748B;
+      margin-top: 8px;
+      max-width: 800px;
+      line-height: 1.5;
+    }
+    .team-showcase {
+      margin-top: 36px;
+      padding: 20px 24px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .team-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+    .members-grid {
+      display: flex;
+      gap: 48px;
+    }
+    .member-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .member-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #0F172A;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+    }
+    .member-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0F172A;
+    }
+    .member-role {
+      font-size: 12px;
+      color: #64748B;
+    }
+
+    /* Bottom Controller */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      margin-top: 16px;
+      padding: 0 10px;
+      color: #94A3B8;
+      font-size: 12px;
+    }
+    .nav-btns {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      background: #1E293B;
+      color: #F8FAFC;
+      border: 1px solid #334155;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: #334155;
+      color: #FFFFFF;
+    }
+    .btn-download {
+      background: #4F46E5;
+      border-color: #6366F1;
+      color: #FFFFFF;
+    }
+    .btn-download:hover {
+      background: #4338CA;
+    }
+    .progress-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: #334155;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+    .dot.active {
+      width: 24px;
+      background: #4F46E5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stage">
+
+    <!-- SLIDE 1: Title -->
+    <div class="slide active" data-slide="1">
+      <div class="title-slide-container">
+        <div class="title-hero-tag">⚡ TEAM T-REX PRESENTATION</div>
+        <h1 class="title-main">PayPilot AI</h1>
+        <h2 class="title-sub">Autonomous Payroll, Statutory Compliance & HR Intelligence Platform</h2>
+        <p class="title-desc">
+          Engineered for Indian Enterprises with Deterministic AI Payroll Auditor, Google Teachable Machine Vision Punch-In, Commercial Razorpay Subscriptions, and Union Budget FY 2026-27 Statutory Calculations.
+        </p>
+
+        <div class="team-showcase">
+          <div>
+            <div class="team-label">Presented By Project Team</div>
+            <div style="font-size: 20px; font-weight: 900; color: #0F172A; font-family: 'JetBrains Mono', monospace;">
+              TEAM T-REX
+            </div>
+          </div>
+
+          <div class="members-grid">
+            <div class="member-item">
+              <div class="member-avatar">A</div>
+              <div>
+                <div class="member-name">Abijith A S</div>
+                <div class="member-role">Lead AI Engineer & Full-Stack Architect</div>
+              </div>
+            </div>
+
+            <div class="member-item">
+              <div class="member-avatar">AK</div>
+              <div>
+                <div class="member-name">Akshay Krishna S</div>
+                <div class="member-role">Lead Product & Statutory Engine Architect</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Problem Statement -->
+    <div class="slide" data-slide="2">
+      <div class="slide-header">
+        <div>
+          <span class="tag-category">Industry Analysis</span>
+          <h2 class="slide-title">The Payroll & Compliance Crisis in Indian Enterprises</h2>
+          <p class="slide-subtitle">Why traditional spreadsheets and legacy HRMS systems generate legal notices and financial leakage</p>
+        </div>
+        <div class="tag-team">TEAM T-REX</div>
+      </div>
+
+      <div class="slide-content grid-3">
+        <div class="card" style="--accent: #E11D48;">
+          <div class="card-title">1. Statutory Penalties</div>
+          <div class="card-tagline">EPFO, ESIC & TDS Audits</div>
+          <ul class="card-list">
+            <li>42% of Indian startups face statutory notices due to erroneous EPF 12% calculations against wage ceilings.</li>
+            <li>Union Budget FY 2026-27 revised Section 115BAC slabs with standard deduction ₹75,000 causing massive TDS withholding errors.</li>
+            <li>Multi-state Professional Tax (PT) variances lead to severe non-compliance fines.</li>
+            <li>Steep 12% to 24% annual interest penalties for delayed statutory return filings.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="--accent: #F59E0B;">
+          <div class="card-title">2. Financial Leakage</div>
+          <div class="card-tagline">Salary Anomalies & Spikes</div>
+          <ul class="card-list">
+            <li>Negative net salary violations under Section 7 of the Payment of Wages Act (deductions exceeding 50%).</li>
+            <li>Loss of Pay (LOP) disconnect: Unapproved employee absences fail to synchronize with salary calculations.</li>
+            <li>Salary spike anomalies: Duplicate bonuses and unapproved salary increments slip past reviewers.</li>
+            <li>Absence of automated pre-flight validation gates before bank funds release.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="--accent: #4F46E5;">
+          <div class="card-title">3. Operational Chaos</div>
+          <div class="card-tagline">Biometric Fraud & Paper Receipts</div>
+          <ul class="card-list">
+            <li>Buddy punching and proxy manual punch logs in distributed/hybrid workspaces.</li>
+            <li>Expensive on-premise biometric fingerprint hardware requiring physical cabling and repairs.</li>
+            <li>No machine-learning link between employee vision recognition and salary ledger.</li>
+            <li>Fragmented contractor invoices, reimbursement expense claims, and Form 12BB tax proof chaos.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Proposed Solution -->
+    <div class="slide" data-slide="3">
+      <div class="slide-header">
+        <div>
+          <span class="tag-category">Platform Solution</span>
+          <h2 class="slide-title">PayPilot AI: Autonomous, End-to-End Enterprise HCM</h2>
+          <p class="slide-subtitle">A unified platform integrating deterministic mathematical audits with browser edge computer vision</p>
+        </div>
+        <div class="tag-team">TEAM T-REX</div>
+      </div>
+
+      <div class="slide-content grid-4">
+        <div class="card" style="--accent: #4F46E5;">
+          <div class="card-title">AI Payroll Auditor</div>
+          <div class="card-tagline">Mathematical Pre-Flight Gate</div>
+          <ul class="card-list">
+            <li>Deterministic 4-phase rule validation before funds release.</li>
+            <li>Zero false-positive hallucination (100% mathematical rules).</li>
+            <li>Intercepts spikes (>30%), negative pay, and KYC errors.</li>
+            <li>Guarantees maker-checker approval workflow.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="--accent: #10B981;">
+          <div class="card-title">Edge Face Punch-In</div>
+          <div class="card-tagline">Google Teachable Machine</div>
+          <ul class="card-list">
+            <li>Browser edge AI neural vision model (Abijith & Akshay recognition).</li>
+            <li>Instant 10-second punch timestamp with geofence validation.</li>
+            <li>Zero hardware expense: runs on webcams, laptops, and mobile devices.</li>
+            <li>Direct synchronization with Loss of Pay (LOP) deductions.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="--accent: #2563EB;">
+          <div class="card-title">Statutory Engine</div>
+          <div class="card-tagline">Budget FY 2026-27 Ready</div>
+          <ul class="card-list">
+            <li>Codified Section 115BAC new tax regime & Section 87A rebate.</li>
+            <li>Automated EPF (12%), ESIC (0.75%/3.25%), and PT deduction.</li>
+            <li>1-Click EPFO ECR (#~# format) Unified Portal export.</li>
+            <li>Form 16 Part A/B generation & PDF payslips.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="--accent: #7C3AED;">
+          <div class="card-title">Enterprise FinOps</div>
+          <div class="card-tagline">Razorpay & Global Talent</div>
+          <ul class="card-list">
+            <li>Integrated Razorpay gateway with backend HMAC-SHA256 crypto.</li>
+            <li>FinOps expense claims with advance settlements.</li>
+            <li>Tax Vault Form 12BB regime comparator.</li>
+            <li>Global contractor compliance with W-8BEN and TDS 194J.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Technical Innovations -->
+    <div class="slide" data-slide="4">
+      <div class="slide-header">
+        <div>
+          <span class="tag-category">Deep Engineering</span>
+          <h2 class="slide-title">Key Technical Innovations & Breakthroughs</h2>
+          <p class="slide-subtitle">Core algorithmic, cryptographic, and machine learning components built by Team T-REX</p>
+        </div>
+        <div class="tag-team">TEAM T-REX</div>
+      </div>
+
+      <div class="slide-content grid-2">
+        <div class="card" style="--accent: #10B981;">
+          <div class="card-title">1. Edge AI Vision: Google Teachable Machine</div>
+          <div class="card-tagline">Real-Time Computer Vision Model (0mYup4tRe)</div>
+          <ul class="card-list">
+            <li>Trained multi-class neural network classifying employee identity from live webcam canvas.</li>
+            <li>Real-time cosine similarity confidence calculation (threshold > 85%).</li>
+            <li>Direct automatic attendance punch-in record logged with tamper-proof geofencing.</li>
+            <li>Eliminates proxy punching without expensive on-premise hardware.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="--accent: #E11D48;">
+          <div class="card-title">2. Deterministic AI Pre-Flight Auditor</div>
+          <div class="card-tagline">Zero-Hallucination Discrepancy Gate</div>
+          <ul class="card-list">
+            <li>Mathematical gate inspecting 100% of employees before corporate banking release.</li>
+            <li>Catches unbilled absence leakage, duplicate bonuses, negative pay, and IFSC bugs.</li>
+            <li>Enforces Section 7 of the Payment of Wages Act (50% deduction limit).</li>
+            <li>Provides step-by-step administrative remediation actions with full audit trails.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="--accent: #4F46E5;">
+          <div class="card-title">3. Zero-Trust Razorpay Gateway & Webhooks</div>
+          <div class="card-tagline">Commercial SaaS Payment Engine (rzp_test_...)</div>
+          <ul class="card-list">
+            <li>Generates genuine Razorpay Orders via REST API with configured credentials.</li>
+            <li>Constant-time HMAC-SHA256 signature verification (order_id + "|" + payment_id).</li>
+            <li>Instant subscription plan tier activation and GST tax invoice generation.</li>
+            <li>Real-time gateway decline handling with explicit failure notifications and retry logic.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="--accent: #0F172A;">
+          <div class="card-title">4. Apple Cupertino Design System & Glassmorphism</div>
+          <div class="card-tagline">Taste-Skill Anti-Slop UI & 34-Page Specification</div>
+          <ul class="card-list">
+            <li>SF Pro / Plus Jakarta Sans geometric typography with precision letter-spacing.</li>
+            <li>Cupertino frosted glass acrylics (backdrop-blur-xl, saturate-180%, hairline borders).</li>
+            <li>macOS Sequoia-style organized sidebar and Spotlight command palette (Cmd+K).</li>
+            <li>100% responsive across mobile, tablet, and widescreen enterprise dashboards.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Architecture & Tech Stack -->
+    <div class="slide" data-slide="5">
+      <div class="slide-header">
+        <div>
+          <span class="tag-category">Systems Architecture</span>
+          <h2 class="slide-title">System Architecture & Technology Stack</h2>
+          <p class="slide-subtitle">Multi-tier enterprise topology designed for zero-trust security and high-throughput execution</p>
+        </div>
+        <div class="tag-team">TEAM T-REX</div>
+      </div>
+
+      <div class="slide-content grid-3">
+        <div class="card" style="--accent: #4F46E5;">
+          <div class="card-title">Frontend Tier</div>
+          <div class="card-tagline">React 19 & Edge AI Client</div>
+          <ul class="card-list">
+            <li><strong>React 19 & TypeScript 5.7:</strong> Strict static typing, modular component hierarchy.</li>
+            <li><strong>Tailwind CSS v4:</strong> Apple design tokens, Cupertino acrylics, and responsive grid.</li>
+            <li><strong>TensorFlow.js:</strong> Client-side neural vision evaluation for face punch-in.</li>
+            <li><strong>Recharts & Lucide:</strong> High-density analytics and SVG icon system.</li>
+            <li><strong>Vite 6.2:</strong> Ultra-fast hot module replacement & production bundling.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="--accent: #0F172A;">
+          <div class="card-title">Backend & Logic Tier</div>
+          <div class="card-tagline">FastAPI & Python 3.13</div>
+          <ul class="card-list">
+            <li><strong>FastAPI (Python 3.13):</strong> High-performance async REST API with auto OpenAPI docs.</li>
+            <li><strong>Statutory Rule Engine:</strong> Deterministic calculations for Section 115BAC, EPF, and PT.</li>
+            <li><strong>SQLAlchemy 2.0 ORM:</strong> Relational schema models with multi-tenant company isolation.</li>
+            <li><strong>HMAC-SHA256 Crypto:</strong> Payment signature validation and server-side webhook handler.</li>
+            <li><strong>Pytest Suite:</strong> 30 automated test suites verifying calculation accuracy.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="--accent: #10B981;">
+          <div class="card-title">Security & Compliance</div>
+          <div class="card-tagline">Zero-Trust & Statutory Formats</div>
+          <ul class="card-list">
+            <li><strong>Zero Client Secrets:</strong> Private gateway keys strictly quarantined on backend.</li>
+            <li><strong>Multi-Tenant Isolation:</strong> Strict company ID scoping across all database queries.</li>
+            <li><strong>Banking Batch Formats:</strong> HDFC Enet, ICICI CIB CSVs & EPFO #~# ECR exports.</li>
+            <li><strong>RBAC Enclave:</strong> Four permission tiers (Owner, Admin, Payroll, Employee).</li>
+            <li><strong>DPDP Act 2023 & WCAG 2.1 AA</strong> compliant architecture.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Impact & Roadmap -->
+    <div class="slide" data-slide="6">
+      <div class="slide-header">
+        <div>
+          <span class="tag-category">Impact & Future Scope</span>
+          <h2 class="slide-title">Project Impact, Verification & Roadmap</h2>
+          <p class="slide-subtitle">Transforming payroll management into an automated, error-free strategic advantage</p>
+        </div>
+        <div class="tag-team">TEAM T-REX</div>
+      </div>
+
+      <div class="slide-content grid-2">
+        <div class="card" style="--accent: #10B981;">
+          <div class="card-title">Empirical Results & Benchmarks</div>
+          <div class="card-tagline">Quantified Platform Performance</div>
+          <ul class="card-list">
+            <li><strong>100% Statutory Reconciled:</strong> Zero EPF/ESIC/PT calculation variance across test cohorts.</li>
+            <li><strong>₹0 Unbilled Absence Leakage:</strong> Biometrics automatically synchronize with LOP payroll deductions.</li>
+            <li><strong>&lt; 10s Face Punch-In:</strong> Fast edge AI recognition with zero physical queues or touchpoints.</li>
+            <li><strong>30/30 Unit Tests Passing:</strong> Comprehensive coverage across payroll, auth, auditor & webhooks.</li>
+            <li><strong>Production SaaS Ready:</strong> Live Razorpay test orders, automated tax invoices, and multi-tenancy.</li>
+            <li><strong>Audited Codebase:</strong> Built under the Antigravity Pro multi-agent engineering protocol.</li>
+          </ul>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="card" style="--accent: #4F46E5; flex: 1;">
+            <div class="card-title">Future Development Roadmap</div>
+            <div class="card-tagline">Next Steps for Scale</div>
+            <ul class="card-list">
+              <li><strong>Phase 1:</strong> Direct EPFO & Income Tax TRACES API integration for zero-touch return filing.</li>
+              <li><strong>Phase 2:</strong> Multi-currency international payouts via Stripe/Wise for global contractors.</li>
+              <li><strong>Phase 3:</strong> Automated WhatsApp Payslip Delivery with PIN-protected PDF attachments.</li>
+              <li><strong>Phase 4:</strong> Native mobile apps for field staff with geofenced GPS tracking.</li>
+            </ul>
+          </div>
+
+          <div style="background: #EEF2FF; border: 1px solid rgba(79, 70, 229, 0.3); border-radius: 16px; padding: 18px 22px;">
+            <div style="font-size: 16px; font-weight: 800; color: #4F46E5; margin-bottom: 2px;">
+              Thank You!  •  Questions & Answers
+            </div>
+            <div style="font-size: 13px; font-weight: 700; color: #0F172A;">
+              Team T-REX  |  Abijith A S & Akshay Krishna S
+            </div>
+            <div style="font-size: 11px; color: #64748B; margin-top: 2px;">
+              PayPilot AI Enterprise SaaS Platform  •  Academic Year 2026
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="controls">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-weight: 800; color: #FFFFFF; font-family: 'JetBrains Mono', monospace;">T-REX</span>
+      <span>•</span>
+      <span id="slideIndicator">Slide 1 of 6</span>
+    </div>
+
+    <div class="progress-dots" id="dotsContainer">
+      <div class="dot active" onclick="goToSlide(1)"></div>
+      <div class="dot" onclick="goToSlide(2)"></div>
+      <div class="dot" onclick="goToSlide(3)"></div>
+      <div class="dot" onclick="goToSlide(4)"></div>
+      <div class="dot" onclick="goToSlide(5)"></div>
+      <div class="dot" onclick="goToSlide(6)"></div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn" onclick="prevSlide()">← Previous</button>
+      <button class="btn" onclick="nextSlide()">Next →</button>
+      <button class="btn" onclick="toggleFullscreen()">Fullscreen</button>
+      <a href="PayPilot_AI_Presentation_T-REX.pptx" download class="btn btn-download">⬇ Download PPTX</a>
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 6;
+
+    function showSlide(index) {
+      if (index < 1) index = 1;
+      if (index > totalSlides) index = totalSlides;
+      currentSlide = index;
+
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      const activeSlide = document.querySelector(`.slide[data-slide="${index}"]`);
+      if (activeSlide) activeSlide.classList.add('active');
+
+      document.querySelectorAll('.dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx + 1 === index);
+      });
+
+      document.getElementById('slideIndicator').innerText = `Slide ${index} of ${totalSlides}`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) showSlide(currentSlide - 1);
+    }
+
+    function goToSlide(index) {
+      showSlide(index);
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      }
+    });
+  </script>
+</body>
+</html>

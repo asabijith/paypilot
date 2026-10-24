@@ -405,7 +405,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         {/* Global Toolbar Controls */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Period Selector */}
-          <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-md px-2.5 py-1.5 text-xs">
+          <div className="flex items-center gap-2 bg-white border border-black/[0.06] rounded-full px-3.5 py-1.5 text-xs shadow-2xs">
             <Calendar className="w-3.5 h-3.5 text-slate-500" />
             <label htmlFor={periodSelectId} className="sr-only">Select Payroll Period</label>
             <select
@@ -463,7 +463,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
         return (
           <section aria-label="Payroll Readiness Command Center" className="space-y-3">
-            <div className={`rounded-xl border p-5 transition-all shadow-xs ${
+            <div className={`rounded-3xl border p-6 transition-all shadow-[0_12px_40px_rgba(0,0,0,0.12)] ${
               isReady
                 ? 'bg-gradient-to-r from-emerald-900 via-slate-900 to-emerald-950 text-white border-emerald-800'
                 : 'bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-slate-800'
@@ -620,7 +620,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           tabIndex={0}
           onClick={() => onNavigateTab('employees')}
           onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('employees')}
-          className="cursor-pointer bg-white p-3.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:shadow-2xs transition-all text-left group relative focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:outline-none"
+          className="cursor-pointer apple-card p-4 border border-black/[0.06] hover:border-black/[0.12] hover:shadow-[0_12px_32px_rgba(0,0,0,0.07)] transition-all duration-300 text-left group relative focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:outline-none"
           aria-label="View Employee Master"
         >
           <div className="flex items-center justify-between">
@@ -654,7 +654,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           tabIndex={0}
           onClick={() => onNavigateTab('attendance')}
           onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('attendance')}
-          className="cursor-pointer bg-white p-3.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:shadow-2xs transition-all text-left group relative focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:outline-none"
+          className="cursor-pointer apple-card p-4 border border-black/[0.06] hover:border-black/[0.12] hover:shadow-[0_12px_32px_rgba(0,0,0,0.07)] transition-all duration-300 text-left group relative focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:outline-none"
           aria-label="View Daily Attendance Terminal"
         >
           <div className="flex items-center justify-between">
@@ -693,7 +693,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           tabIndex={0}
           onClick={() => onNavigateTab('leave')}
           onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('leave')}
-          className="cursor-pointer bg-white p-3.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:shadow-2xs transition-all text-left group relative focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:outline-none"
+          className="cursor-pointer apple-card p-4 border border-black/[0.06] hover:border-black/[0.12] hover:shadow-[0_12px_32px_rgba(0,0,0,0.07)] transition-all duration-300 text-left group relative focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:outline-none"
           aria-label="View Pending Leave Approvals"
         >
           <div className="flex items-center justify-between">
@@ -727,7 +727,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           tabIndex={0}
           onClick={() => onNavigateTab('payroll')}
           onKeyDown={(e) => e.key === 'Enter' && onNavigateTab('payroll')}
-          className="cursor-pointer bg-white p-3.5 rounded-lg border border-slate-200 hover:border-slate-300 hover:shadow-2xs transition-all text-left group relative focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:outline-none"
+          className="cursor-pointer apple-card p-4 border border-black/[0.06] hover:border-black/[0.12] hover:shadow-[0_12px_32px_rgba(0,0,0,0.07)] transition-all duration-300 text-left group relative focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:outline-none"
           aria-label="View Payroll Run"
         >
           <div className="flex items-center justify-between">

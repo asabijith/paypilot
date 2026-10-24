@@ -4,7 +4,9 @@ from sqlalchemy.orm import Session
 from app.models import (
     Company, User, Employee, SalaryStructure,
     AttendanceRecord, LeaveBalance, LeaveRequest,
-    PayrollPeriod, PayrollItem, AuditFinding, AuditLog
+    PayrollPeriod, PayrollItem, AuditFinding, AuditLog,
+    ExpenseClaim, SalaryAdvance, TaxDeclaration,
+    Contractor, ContractorInvoice, ComplianceFiling
 )
 from app.config import settings
 from app.payroll_engine import calculate_payroll_item
@@ -19,6 +21,12 @@ def seed_database(db: Session, force: bool = False):
 
     if force:
         # Clear existing data
+        db.query(ExpenseClaim).delete()
+        db.query(SalaryAdvance).delete()
+        db.query(TaxDeclaration).delete()
+        db.query(ContractorInvoice).delete()
+        db.query(Contractor).delete()
+        db.query(ComplianceFiling).delete()
         db.query(AuditFinding).delete()
         db.query(AuditLog).delete()
         db.query(PayrollItem).delete()
@@ -554,7 +562,395 @@ def seed_database(db: Session, force: bool = False):
         action="INITIALIZE_SEED",
         entity_type="SYSTEM",
         entity_id="ALL",
-        details="Seeded initial Indian enterprise HR & Payroll records with demonstration anomalies"
+        details="Seeded initial Indian enterprise HR & Payroll records with demonstration data."
     ))
+
+    # 9. FinOps Expense Claims
+    exp_claims = [
+        ExpenseClaim(
+            id="exp_001",
+            company_id=comp.id,
+            employee_id="emp_001",
+            employee_name="Sneha Rao",
+            title="Client Meeting in Mumbai (Airfare & Stay)",
+            category="travel",
+            amount=14500.0,
+            currency="INR",
+            expense_date=date(2026, 10, 5),
+            status="approved",
+            tax_treatment="tax_free_sec10",
+            receipt_name="indigo_hotel_mumbai.pdf",
+            merchant_name="IndiGo & Marriott",
+            gstin="27AABCM1234F1Z1",
+            policy_violation_flag=False,
+            approved_by="usr_admin",
+            approved_at=datetime.utcnow() - timedelta(days=15),
+            created_at=datetime.utcnow() - timedelta(days=18)
+        ),
+        ExpenseClaim(
+            id="exp_002",
+            company_id=comp.id,
+            employee_id="emp_002",
+            employee_name="Rohan Verma",
+            title="Monthly High-Speed Fiber Internet",
+            category="remote_work_internet",
+            amount=2499.0,
+            currency="INR",
+            expense_date=date(2026, 10, 1),
+            status="approved",
+            tax_treatment="tax_free_sec10",
+            receipt_name="airtel_broadband_oct.pdf",
+            merchant_name="Airtel Broadband Ltd",
+            gstin="29AABCA0123F1Z8",
+            policy_violation_flag=False,
+            approved_by="usr_admin",
+            approved_at=datetime.utcnow() - timedelta(days=20),
+            created_at=datetime.utcnow() - timedelta(days=22)
+        ),
+        ExpenseClaim(
+            id="exp_003",
+            company_id=comp.id,
+            employee_id="emp_003",
+            employee_name="Priya Sharma",
+            title="AWS Solutions Architect Exam & Courseware",
+            category="learning_certifications",
+            amount=22000.0,
+            currency="INR",
+            expense_date=date(2026, 10, 12),
+            status="submitted",
+            tax_treatment="tax_free_sec10",
+            receipt_name="aws_certification_fee.pdf",
+            merchant_name="Amazon Web Services",
+            gstin=None,
+            policy_violation_flag=False,
+            created_at=datetime.utcnow() - timedelta(days=11)
+        ),
+        ExpenseClaim(
+            id="exp_004",
+            company_id=comp.id,
+            employee_id="emp_004",
+            employee_name="Vikram Singh",
+            title="Enterprise Prospect Dinner at Leela",
+            category="client_entertainment",
+            amount=8200.0,
+            currency="INR",
+            expense_date=date(2026, 10, 18),
+            status="submitted",
+            tax_treatment="taxable_perquisite_sec17",
+            receipt_name="leela_dining_bill.pdf",
+            merchant_name="The Leela Palace",
+            gstin="29AABCL5555M1Z2",
+            policy_violation_flag=True,
+            policy_violation_notes="Claim exceeds standard client dining threshold of ₹5,000 without VP pre-approval.",
+            created_at=datetime.utcnow() - timedelta(days=5)
+        )
+    ]
+    for c in exp_claims:
+        db.add(c)
+
+    # Salary Advances
+    adv = SalaryAdvance(
+        id="adv_001",
+        company_id=comp.id,
+        employee_id="emp_005",
+        employee_name="Amit Patel",
+        amount_requested=60000.0,
+        amount_approved=60000.0,
+        reason="Emergency medical expenses for father hospitalization",
+        tenure_months=3,
+        monthly_emi=20000.0,
+        amount_recovered=20000.0,
+        status="active_deduction",
+        applied_date=date(2026, 9, 10),
+        approved_by="usr_admin",
+        approved_at=datetime.utcnow() - timedelta(days=40),
+        created_at=datetime.utcnow() - timedelta(days=42)
+    )
+    db.add(adv)
+
+    # 10. Tax Optimization Declarations (Form 12BB)
+    tax_decls = [
+        TaxDeclaration(
+            id="tax_decl_001",
+            company_id=comp.id,
+            employee_id="emp_001",
+            employee_name="Sneha Rao",
+            financial_year="2026-27",
+            regime_selected="old",
+            sec_80c_declared=150000.0,
+            sec_80c_approved=150000.0,
+            sec_80d_health_declared=25000.0,
+            sec_80d_health_approved=25000.0,
+            sec_24b_home_loan_interest_declared=180000.0,
+            sec_24b_home_loan_interest_approved=180000.0,
+            sec_80ccd_nps_declared=50000.0,
+            sec_80ccd_nps_approved=50000.0,
+            hra_annual_rent_declared=300000.0,
+            hra_annual_rent_approved=300000.0,
+            landlord_pan="ABCDE1234F",
+            landlord_name="Suresh Kulkarni",
+            rental_city_type="metro",
+            status="verified",
+            verification_notes="All 80C, 80D receipts and Rent Agreement verified against landlord PAN.",
+            verified_by="usr_admin",
+            verified_at=datetime.utcnow() - timedelta(days=30),
+            created_at=datetime.utcnow() - timedelta(days=30)
+        ),
+        TaxDeclaration(
+            id="tax_decl_002",
+            company_id=comp.id,
+            employee_id="emp_002",
+            employee_name="Rohan Verma",
+            financial_year="2026-27",
+            regime_selected="new",
+            sec_80c_declared=0.0,
+            sec_80c_approved=0.0,
+            sec_80d_health_declared=0.0,
+            sec_80d_health_approved=0.0,
+            sec_24b_home_loan_interest_declared=0.0,
+            sec_24b_home_loan_interest_approved=0.0,
+            sec_80ccd_nps_declared=0.0,
+            sec_80ccd_nps_approved=0.0,
+            hra_annual_rent_declared=0.0,
+            hra_annual_rent_approved=0.0,
+            status="verified",
+            verification_notes="Opted for Section 115BAC Default Simplified Slabs (no deductions claimed).",
+            verified_by="usr_admin",
+            verified_at=datetime.utcnow() - timedelta(days=28),
+            created_at=datetime.utcnow() - timedelta(days=28)
+        ),
+        TaxDeclaration(
+            id="tax_decl_003",
+            company_id=comp.id,
+            employee_id="emp_003",
+            employee_name="Priya Sharma",
+            financial_year="2026-27",
+            regime_selected="old",
+            sec_80c_declared=120000.0,
+            sec_80c_approved=0.0,
+            sec_80d_health_declared=15000.0,
+            sec_80d_health_approved=0.0,
+            sec_24b_home_loan_interest_declared=0.0,
+            sec_24b_home_loan_interest_approved=0.0,
+            sec_80ccd_nps_declared=50000.0,
+            sec_80ccd_nps_approved=0.0,
+            hra_annual_rent_declared=180000.0,
+            hra_annual_rent_approved=0.0,
+            landlord_pan="BKWPM9876C",
+            landlord_name="Kavita Mehta",
+            rental_city_type="metro",
+            status="submitted",
+            verification_notes="Pending verification of NPS deposit acknowledgement.",
+            created_at=datetime.utcnow() - timedelta(days=10)
+        )
+    ]
+    for td in tax_decls:
+        db.add(td)
+
+    # 11. Global Contractors & Invoices
+    c1 = Contractor(
+        id="cont_001",
+        company_id=comp.id,
+        contractor_code="CON-US-001",
+        name="Sarah Jenkins",
+        email="sarah.jenkins@cloudcraft.io",
+        phone="+1 415 555 2671",
+        country="United States",
+        currency="USD",
+        contractor_type="individual",
+        service_type="cloud_devops",
+        pan_or_tax_id="US-SSN-9021",
+        w8ben_status="verified",
+        withholding_section="non_resident_wire",
+        withholding_rate_pct=0.0,
+        rate_per_hour_or_month=4500.0,
+        rate_type="fixed_monthly",
+        bank_name="JPMorgan Chase Bank N.A.",
+        bank_account="987654321098",
+        ifsc_or_swift="CHASUS33XXX",
+        status="active",
+        created_at=datetime.utcnow() - timedelta(days=90)
+    )
+    c2 = Contractor(
+        id="cont_002",
+        company_id=comp.id,
+        contractor_code="CON-DE-002",
+        name="Marco Rossi",
+        email="m.rossi@berlinsec.de",
+        phone="+49 30 1234567",
+        country="Germany",
+        currency="EUR",
+        contractor_type="individual",
+        service_type="software_engineering",
+        pan_or_tax_id="DE-TAX-4458",
+        w8ben_status="verified",
+        withholding_section="non_resident_wire",
+        withholding_rate_pct=0.0,
+        rate_per_hour_or_month=3800.0,
+        rate_type="fixed_monthly",
+        bank_name="Deutsche Bank AG",
+        bank_account="DE89370400440532013000",
+        ifsc_or_swift="DEUTDEDBFXX",
+        status="active",
+        created_at=datetime.utcnow() - timedelta(days=60)
+    )
+    c3 = Contractor(
+        id="cont_003",
+        company_id=comp.id,
+        contractor_code="CON-IN-003",
+        name="Rajesh Legal & Advisory LLP",
+        email="compliance@rajeshpartners.in",
+        phone="+91 9820011223",
+        country="India",
+        currency="INR",
+        contractor_type="company",
+        service_type="legal_advisory",
+        pan_or_tax_id="AAACR1234F",
+        gstin="29AAACR1234F1Z5",
+        w8ben_status="not_applicable",
+        withholding_section="194J",
+        withholding_rate_pct=10.0,
+        rate_per_hour_or_month=75000.0,
+        rate_type="fixed_monthly",
+        bank_name="HDFC Bank Ltd",
+        bank_account="50200012345678",
+        ifsc_or_swift="HDFC0000123",
+        status="active",
+        created_at=datetime.utcnow() - timedelta(days=120)
+    )
+    db.add(c1)
+    db.add(c2)
+    db.add(c3)
+
+    invoices = [
+        ContractorInvoice(
+            id="inv_001",
+            company_id=comp.id,
+            contractor_id="cont_001",
+            invoice_number="INV-2026-US-081",
+            invoice_date=date(2026, 10, 1),
+            due_date=date(2026, 10, 20),
+            currency="USD",
+            subtotal_amount=4500.0,
+            gst_amount=0.0,
+            tds_withheld_amount=0.0,
+            net_payable_amount=4500.0,
+            fx_rate_to_inr=86.50,
+            net_inr_equivalent=389250.0,
+            description="Cloud infrastructure architecture & Kubernetes cluster optimization - October 2026",
+            status="approved",
+            payment_reference="SWIFT-WIRE-US-9912",
+            created_at=datetime.utcnow() - timedelta(days=22)
+        ),
+        ContractorInvoice(
+            id="inv_002",
+            company_id=comp.id,
+            contractor_id="cont_002",
+            invoice_number="INV-2026-DE-082",
+            invoice_date=date(2026, 10, 10),
+            due_date=date(2026, 10, 28),
+            currency="EUR",
+            subtotal_amount=3800.0,
+            gst_amount=0.0,
+            tds_withheld_amount=0.0,
+            net_payable_amount=3800.0,
+            fx_rate_to_inr=91.20,
+            net_inr_equivalent=346560.0,
+            description="Penetration testing & OWASP Top 10 security audit",
+            status="pending_approval",
+            created_at=datetime.utcnow() - timedelta(days=14)
+        ),
+        ContractorInvoice(
+            id="inv_003",
+            company_id=comp.id,
+            contractor_id="cont_003",
+            invoice_number="INV-2026-IN-083",
+            invoice_date=date(2026, 10, 2),
+            due_date=date(2026, 10, 15),
+            currency="INR",
+            subtotal_amount=75000.0,
+            gst_amount=13500.0,
+            tds_withheld_amount=7500.0,
+            net_payable_amount=81000.0,
+            fx_rate_to_inr=1.0,
+            net_inr_equivalent=81000.0,
+            description="Monthly legal advisory retainer & corporate MCA filing assistance",
+            status="paid",
+            payment_reference="CMS-NEFT-IN-4821",
+            paid_at=datetime.utcnow() - timedelta(days=9),
+            created_at=datetime.utcnow() - timedelta(days=21)
+        )
+    ]
+    for inv in invoices:
+        db.add(inv)
+
+    # 12. Statutory Compliance Filings
+    filings = [
+        ComplianceFiling(
+            id="comp_001",
+            company_id=comp.id,
+            filing_type="epf_ecr",
+            period_label="September 2026",
+            due_date=date(2026, 10, 15),
+            statutory_authority="EPFO India",
+            amount_payable=142800.0,
+            status="filed_on_time",
+            challan_reference="ECR/2026/09/88219",
+            bsr_code="0510304",
+            cin_number="05103041510202600812",
+            filed_at=datetime.utcnow() - timedelta(days=9),
+            created_at=datetime.utcnow() - timedelta(days=20)
+        ),
+        ComplianceFiling(
+            id="comp_002",
+            company_id=comp.id,
+            filing_type="esic_challan",
+            period_label="September 2026",
+            due_date=date(2026, 10, 15),
+            statutory_authority="ESIC Corporation",
+            amount_payable=34200.0,
+            status="filed_on_time",
+            challan_reference="ESIC-CHALLAN-90182",
+            bsr_code="0510304",
+            cin_number="05103041510202600813",
+            filed_at=datetime.utcnow() - timedelta(days=9),
+            created_at=datetime.utcnow() - timedelta(days=20)
+        ),
+        ComplianceFiling(
+            id="comp_003",
+            company_id=comp.id,
+            filing_type="tds_challan_281",
+            period_label="October 2026",
+            due_date=date(2026, 11, 7),
+            statutory_authority="Income Tax Department (TRACES)",
+            amount_payable=185600.0,
+            status="pending",
+            created_at=datetime.utcnow() - timedelta(days=5)
+        ),
+        ComplianceFiling(
+            id="comp_004",
+            company_id=comp.id,
+            filing_type="pt_return",
+            period_label="October 2026",
+            due_date=date(2026, 11, 20),
+            statutory_authority="Commercial Taxes Department (Karnataka)",
+            amount_payable=9800.0,
+            status="pending",
+            created_at=datetime.utcnow() - timedelta(days=5)
+        ),
+        ComplianceFiling(
+            id="comp_005",
+            company_id=comp.id,
+            filing_type="form_24q",
+            period_label="Q2 FY2026-27",
+            due_date=date(2026, 10, 31),
+            statutory_authority="Directorate of Income Tax (Systems)",
+            amount_payable=556800.0,
+            status="pending",
+            created_at=datetime.utcnow() - timedelta(days=15)
+        )
+    ]
+    for fil in filings:
+        db.add(fil)
 
     db.commit()

@@ -102,15 +102,15 @@ export const MarketingLandingPage: React.FC<MarketingLandingPageProps> = ({
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-500 selection:text-white">
       {/* 1. TOP HEADER NAVIGATION */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+      <header className="apple-glass sticky top-0 z-40 border-b border-black/[0.06] shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center font-bold text-white text-sm">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-b from-slate-900 via-slate-800 to-indigo-950 flex items-center justify-center font-bold text-white text-sm shadow-[0_2px_8px_rgba(0,0,0,0.15)] ring-1 ring-white/20">
               P
             </div>
             <div className="flex items-baseline gap-1.5">
               <span className="font-extrabold text-base tracking-tight text-slate-900">PayPilot</span>
-              <span className="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded">
+              <span className="text-[10px] font-bold tracking-wide uppercase px-1.5 py-0.2 rounded-md bg-indigo-500/10 text-indigo-600 border border-indigo-500/20">
                 HCM
               </span>
             </div>
@@ -127,7 +127,7 @@ export const MarketingLandingPage: React.FC<MarketingLandingPageProps> = ({
           <div className="flex items-center gap-2.5">
             <button
               onClick={onEnterApp}
-              className="cursor-pointer hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-300 transition-colors"
+              className="cursor-pointer hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100/80 hover:bg-slate-200/70 text-slate-800 border border-black/[0.05] transition-all shadow-2xs active:scale-[0.98]"
               title="Launch the live pre-seeded evaluation sandbox"
             >
               <Play className="w-3.5 h-3.5 text-indigo-600 fill-indigo-600" />
@@ -143,7 +143,7 @@ export const MarketingLandingPage: React.FC<MarketingLandingPageProps> = ({
 
             <button
               onClick={() => onOpenRegister('free_trial')}
-              className="cursor-pointer px-3.5 py-1.5 rounded-md text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white transition-colors flex items-center gap-1.5 shadow-2xs"
+              className="cursor-pointer px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white transition-all flex items-center gap-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.1)] active:scale-[0.98]"
             >
               <span>Start Free Trial</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -153,15 +153,18 @@ export const MarketingLandingPage: React.FC<MarketingLandingPageProps> = ({
       </header>
 
       {/* 2. HERO SECTION */}
-      <section className="pt-16 pb-20 bg-gradient-to-b from-slate-50 to-white border-b border-slate-200">
+      <section className="pt-20 pb-24 bg-gradient-to-b from-slate-50/70 via-white to-slate-50 border-b border-black/[0.06]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-black/[0.06] text-slate-700 text-xs font-medium shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>Updated for FY 2026-27 Union Budget &bull; Section 115BAC &bull; EPFO ECR Direct Export</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.12] font-sans">
-            Payroll Clarity. Compliance Confidence.
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-[1.08] font-sans">
+            Payroll Clarity. <br className="hidden sm:inline" />
+            <span className="bg-gradient-to-r from-slate-900 via-indigo-900 to-indigo-600 bg-clip-text text-transparent">
+              Compliance Confidence.
+            </span>
           </h1>
 
           <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed font-normal">
@@ -171,7 +174,7 @@ export const MarketingLandingPage: React.FC<MarketingLandingPageProps> = ({
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <button
               onClick={onEnterApp}
-              className="cursor-pointer w-full sm:w-auto px-6 py-3 rounded-lg font-semibold text-sm bg-slate-900 hover:bg-slate-800 text-white shadow-2xs transition-colors flex items-center justify-center gap-2"
+              className="cursor-pointer w-full sm:w-auto px-7 py-3.5 rounded-full font-semibold text-sm bg-slate-900 hover:bg-slate-800 text-white shadow-[0_4px_16px_rgba(0,0,0,0.12)] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
               <Play className="w-4 h-4 fill-white" />
               <span>Explore Interactive Demo</span>
@@ -179,7 +182,7 @@ export const MarketingLandingPage: React.FC<MarketingLandingPageProps> = ({
 
             <button
               onClick={() => onOpenRegister('free_trial')}
-              className="cursor-pointer w-full sm:w-auto px-6 py-3 rounded-lg font-semibold text-sm bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-2xs transition-colors flex items-center justify-center gap-1.5"
+              className="cursor-pointer w-full sm:w-auto px-7 py-3.5 rounded-full font-semibold text-sm bg-white hover:bg-slate-50 text-slate-800 border border-black/[0.1] shadow-[0_2px_8px_rgba(0,0,0,0.03)] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
             >
               <span>Start Free Trial</span>
               <ArrowRight className="w-4 h-4 text-slate-500" />
@@ -201,14 +204,14 @@ export const MarketingLandingPage: React.FC<MarketingLandingPageProps> = ({
 
         {/* 3. PRODUCT DEMO SHOWCASE (Realistic Enterprise UI) */}
         <div id="showcase" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-          <div className="bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-white border border-black/[0.08] rounded-3xl shadow-[0_24px_70px_-15px_rgba(0,0,0,0.08)] overflow-hidden ring-1 ring-black/[0.03]">
             {/* Window Topbar & Metrics Ribbon */}
             <div className="bg-slate-50 border-b border-slate-200 px-5 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2.5">
                 <div className="flex gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
+                  <span className="w-3 h-3 rounded-full bg-[#FF5F56] shadow-2xs" />
+                  <span className="w-3 h-3 rounded-full bg-[#FFBD2E] shadow-2xs" />
+                  <span className="w-3 h-3 rounded-full bg-[#27C93F] shadow-2xs" />
                 </div>
                 <span className="font-bold text-slate-900 ml-1">
                   PayPilot AI HCM Workspace &bull; October 2026 Cycle
@@ -219,7 +222,7 @@ export const MarketingLandingPage: React.FC<MarketingLandingPageProps> = ({
               </div>
 
               {/* Showcase Navigation Tabs */}
-              <div className="flex items-center gap-1 bg-white border border-slate-200 p-0.5 rounded-md text-xs font-medium">
+              <div className="apple-segmented-track">
                 <button
                   onClick={() => setShowcaseTab('auditor')}
                   className={`cursor-pointer px-3 py-1 rounded transition-colors ${
@@ -502,7 +505,7 @@ export const MarketingLandingPage: React.FC<MarketingLandingPageProps> = ({
             </p>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="apple-card p-6 sm:p-10 shadow-[0_12px_40px_rgba(0,0,0,0.05)] border border-black/[0.06] grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Left Controls */}
             <div className="lg:col-span-6 space-y-5">
               <div>
@@ -802,7 +805,7 @@ export const MarketingLandingPage: React.FC<MarketingLandingPageProps> = ({
 
             {/* Monthly / Annual Toggle */}
             <div className="pt-4 flex items-center justify-center">
-              <div className="inline-flex items-center gap-1 p-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold shadow-2xs">
+              <div className="apple-segmented-track">
                 <button
                   onClick={() => setBillingCycle('monthly')}
                   className={`cursor-pointer px-4 py-1.5 rounded transition-colors ${

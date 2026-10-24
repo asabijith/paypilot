@@ -1,0 +1,22 @@
+services:
+  # 1. FastAPI Backend Web Service
+  - type: web
+    name: paypilot-backend
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: RAZORPAY_KEY_ID
+        value: rzp_test_ix2MK7zqiggJX7
+      - key: RAZORPAY_KEY_SECRET
+        value: k83caBjtnyKmD5fen5V4TYDx
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true

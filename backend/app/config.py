@@ -30,8 +30,8 @@ class Settings(BaseSettings):
     DEFAULT_COMPANY_NAME: str = "BharatTech Innovations Pvt. Ltd."
 
     # Payment Gateway (Razorpay India)
-    RAZORPAY_KEY_ID: str = os.getenv("RAZORPAY_KEY_ID", "rzp_test_paypilot_saas_2026")
-    RAZORPAY_KEY_SECRET: str = os.getenv("RAZORPAY_KEY_SECRET", "sec_paypilot_live_demo_test")
+    RAZORPAY_KEY_ID: str = os.getenv("RAZORPAY_KEY_ID", "rzp_test_ix2MK7zqiggJX7")
+    RAZORPAY_KEY_SECRET: str = os.getenv("RAZORPAY_KEY_SECRET", "k83caBjtnyKmD5fen5V4TYDx")
     RAZORPAY_WEBHOOK_SECRET: str = os.getenv("RAZORPAY_WEBHOOK_SECRET", "whsec_paypilot_hmac_2026")
 
     # CORS

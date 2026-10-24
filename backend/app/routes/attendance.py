@@ -81,7 +81,7 @@ def mark_attendance(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if user.role not in ["admin", "payroll_admin"]:
+    if user.role not in ["admin", "payroll_admin"] and user.employee_id != req.employee_id and user.id != req.employee_id:
         raise HTTPException(status_code=403, detail="Permission denied")
 
     comp_id = user.company_id

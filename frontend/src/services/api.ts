@@ -1,6 +1,8 @@
 import {
   User, Employee, SalaryStructure, AttendanceRecord, LeaveBalance, LeaveRequest, PayrollPeriod, PayrollItem, AuditFinding, PayslipData,
-  SimulationResult, SimulationScenario, PayrollForecastData, AnomalyRadarData, ExplainPayslipResult, HRWorkflowTaskItem, IntelligenceSummary
+  SimulationResult, SimulationScenario, PayrollForecastData, AnomalyRadarData, ExplainPayslipResult, HRWorkflowTaskItem, IntelligenceSummary,
+  ExpenseClaim, SalaryAdvance, ExpensesSummary, TaxDeclaration, TaxRegimeComparisonResult,
+  Contractor, ContractorInvoice, ComplianceFiling, ComplianceCalendarResponse, Form16Data
 } from '../types';
 import {
   INITIAL_DEMO_USERS,
@@ -1234,7 +1236,40 @@ export const api = {
     }>(`/api/intelligence/workflow/tasks/${taskId}/review`, {
       method: 'POST',
       body: JSON.stringify({ action })
-    })
+    }),
+
+  // FinOps & Expense Claims
+  getExpensesSummary: () => expensesApi.getSummary(),
+  getClaims: (params?: { employee_id?: string; category?: string; status?: string }) => expensesApi.getClaims(params),
+  submitClaim: (payload: any) => expensesApi.submitClaim(payload),
+  updateClaimStatus: (claimId: string, status: string, rejectionReason?: string) => expensesApi.updateClaimStatus(claimId, status, rejectionReason),
+  getAdvances: (employeeId?: string, status?: string) => expensesApi.getAdvances(employeeId, status),
+  requestAdvance: (payload: any) => expensesApi.requestAdvance(payload),
+  updateAdvanceStatus: (advanceId: string, status: string, amountApproved?: number) => expensesApi.updateAdvanceStatus(advanceId, status, amountApproved),
+  exportBankCMS: (claimIds?: string[]) => expensesApi.exportBankCMS(claimIds),
+
+  // Tax Vault & Form 12BB
+  getTaxDeclarations: (financialYear?: string, status?: string) => taxVaultApi.getDeclarations(financialYear, status),
+  getEmployeeTaxDeclaration: (employeeId: string, financialYear?: string) => taxVaultApi.getEmployeeDeclaration(employeeId, financialYear),
+  saveTaxDeclaration: (payload: any) => taxVaultApi.saveDeclaration(payload),
+  verifyTaxDeclaration: (payload: any) => taxVaultApi.verifyDeclaration(payload),
+  compareTaxRegimes: (payload: any) => taxVaultApi.compareRegimes(payload),
+
+  // Global Contractors
+  getContractors: (country?: string, currency?: string, status?: string) => contractorsApi.getContractors(country, currency, status),
+  createContractor: (payload: any) => contractorsApi.createContractor(payload),
+  getContractorInvoices: (contractorId?: string, status?: string) => contractorsApi.getInvoices(contractorId, status),
+  createContractorInvoice: (payload: any) => contractorsApi.createInvoice(payload),
+  updateContractorInvoiceStatus: (invoiceId: string, status: string, paymentReference?: string) => contractorsApi.updateInvoiceStatus(invoiceId, status, paymentReference),
+  exportBatchWire: (invoiceIds?: string[]) => contractorsApi.exportBatchWire(invoiceIds),
+
+  // Statutory Compliance & Form 16/24Q
+  getCalendar: (filingType?: string, status?: string) => complianceApi.getCalendar(filingType, status),
+  createFiling: (payload: any) => complianceApi.createFiling(payload),
+  markFilingFiled: (filingId: string, payload: any) => complianceApi.markFilingFiled(filingId, payload),
+  calculatePenalty: (payload: any) => complianceApi.calculatePenalty(payload),
+  getForm16: (employeeId: string, assessmentYear?: string) => complianceApi.getForm16(employeeId, assessmentYear),
+  getForm24Q: (quarter?: string) => complianceApi.getForm24Q(quarter)
 };
 
 export const formatINR = (amount: number = 0): string => {
@@ -1243,4 +1278,285 @@ export const formatINR = (amount: number = 0): string => {
     currency: 'INR',
     maximumFractionDigits: 2
   }).format(amount);
+};
+
+// ==========================================
+// FINOPS & REIMBURSEMENTS API
+// ==========================================
+
+export const expensesApi = {
+  getClaims: (params?: { employee_id?: string; category?: string; status?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.employee_id) q.append('employee_id', params.employee_id);
+    if (params?.category) q.append('category', params.category);
+    if (params?.status) q.append('status', params.status);
+    const qs = q.toString();
+    return request<ExpenseClaim[]>(`/api/expenses/claims${qs ? '?' + qs : ''}`);
+  },
+
+  submitClaim: (payload: {
+    employee_id: string;
+    title: string;
+    category: string;
+    amount: number;
+    currency?: string;
+    expense_date?: string;
+    tax_treatment?: string;
+    receipt_name?: string;
+    merchant_name: string;
+    gstin?: string;
+  }) =>
+    request<{ message: string; claim: ExpenseClaim; policy_flag: boolean }>('/api/expenses/claims', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  updateClaimStatus: (claimId: string, status: string, rejectionReason?: string) =>
+    request<{ message: string; claim: ExpenseClaim }>(`/api/expenses/claims/${claimId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, rejection_reason: rejectionReason })
+    }),
+
+  getAdvances: (employeeId?: string, status?: string) => {
+    const q = new URLSearchParams();
+    if (employeeId) q.append('employee_id', employeeId);
+    if (status) q.append('status', status);
+    const qs = q.toString();
+    return request<SalaryAdvance[]>(`/api/expenses/advances${qs ? '?' + qs : ''}`);
+  },
+
+  requestAdvance: (payload: {
+    employee_id: string;
+    amount_requested: number;
+    reason: string;
+    tenure_months?: number;
+  }) =>
+    request<{ message: string; id: string }>('/api/expenses/advances', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  updateAdvanceStatus: (advanceId: string, status: string, amountApproved?: number) =>
+    request<{ message: string; advance: SalaryAdvance }>(`/api/expenses/advances/${advanceId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, amount_approved: amountApproved })
+    }),
+
+  getSummary: () =>
+    request<ExpensesSummary>('/api/expenses/summary'),
+
+  exportBankCMS: (claimIds?: string[]) => {
+    const q = new URLSearchParams();
+    if (claimIds && claimIds.length > 0) {
+      claimIds.forEach(id => q.append('claim_ids', id));
+    }
+    const qs = q.toString();
+    return request<{
+      batch_reference: string;
+      total_records: number;
+      total_disbursement_inr: number;
+      records: Array<{
+        beneficiary_name: string;
+        account_number: string;
+        ifsc_code: string;
+        amount: number;
+        remarks: string;
+      }>;
+    }>(`/api/expenses/export/batch-cms${qs ? '?' + qs : ''}`);
+  }
+};
+
+// ==========================================
+// TAX VAULT & FORM 12BB API
+// ==========================================
+
+export const taxVaultApi = {
+  getDeclarations: (financialYear?: string, status?: string) => {
+    const q = new URLSearchParams();
+    if (financialYear) q.append('financial_year', financialYear);
+    if (status) q.append('status', status);
+    const qs = q.toString();
+    return request<TaxDeclaration[]>(`/api/tax-vault/declarations${qs ? '?' + qs : ''}`);
+  },
+
+  getEmployeeDeclaration: (employeeId: string, financialYear?: string) => {
+    const qs = financialYear ? `?financial_year=${encodeURIComponent(financialYear)}` : '';
+    return request<TaxDeclaration & {
+      annual_ctc: number;
+      comparison_summary: TaxRegimeComparisonResult;
+    }>(`/api/tax-vault/declarations/${employeeId}${qs}`);
+  },
+
+  saveDeclaration: (payload: any) =>
+    request<{ message: string; declaration: TaxDeclaration }>('/api/tax-vault/declarations', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  verifyDeclaration: (payload: {
+    declaration_id: string;
+    sec_80c_approved: number;
+    sec_80d_health_approved: number;
+    sec_24b_home_loan_interest_approved: number;
+    sec_80ccd_nps_approved: number;
+    hra_annual_rent_approved: number;
+    other_exemptions_approved?: number;
+    verification_notes?: string;
+  }) =>
+    request<{ message: string; declaration: TaxDeclaration }>('/api/tax-vault/verify', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  compareRegimes: (payload: {
+    ctc_annual: number;
+    basic_annual?: number;
+    hra_annual?: number;
+    sec_80c?: number;
+    sec_80d?: number;
+    sec_24b?: number;
+    sec_80ccd?: number;
+    annual_rent?: number;
+    city_type?: string;
+  }) =>
+    request<TaxRegimeComparisonResult>('/api/tax-vault/compare', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+};
+
+// ==========================================
+// GLOBAL CONTRACTORS API
+// ==========================================
+
+export const contractorsApi = {
+  getContractors: (country?: string, currency?: string, status?: string) => {
+    const q = new URLSearchParams();
+    if (country) q.append('country', country);
+    if (currency) q.append('currency', currency);
+    if (status) q.append('status', status);
+    const qs = q.toString();
+    return request<Contractor[]>(`/api/contractors/${qs ? '?' + qs : ''}`);
+  },
+
+  createContractor: (payload: any) =>
+    request<Contractor>('/api/contractors/', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  getInvoices: (contractorId?: string, status?: string) => {
+    const q = new URLSearchParams();
+    if (contractorId) q.append('contractor_id', contractorId);
+    if (status) q.append('status', status);
+    const qs = q.toString();
+    return request<ContractorInvoice[]>(`/api/contractors/invoices${qs ? '?' + qs : ''}`);
+  },
+
+  createInvoice: (payload: any) =>
+    request<{ message: string; invoice: ContractorInvoice }>('/api/contractors/invoices', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  updateInvoiceStatus: (invoiceId: string, status: string, paymentReference?: string) =>
+    request<{ message: string; invoice: ContractorInvoice }>(`/api/contractors/invoices/${invoiceId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, payment_reference: paymentReference })
+    }),
+
+  exportBatchWire: (invoiceIds?: string[]) => {
+    const q = new URLSearchParams();
+    if (invoiceIds && invoiceIds.length > 0) {
+      invoiceIds.forEach(id => q.append('invoice_ids', id));
+    }
+    const qs = q.toString();
+    return request<{
+      batch_reference: string;
+      total_invoices: number;
+      total_foreign_payouts: Record<string, number>;
+      total_inr_commitment: number;
+      settlements: Array<{
+        invoice_number: string;
+        beneficiary_name: string;
+        country: string;
+        currency: string;
+        foreign_amount: number;
+        inr_equivalent: number;
+        bank_name: string;
+        swift_bic: string;
+        status: string;
+      }>;
+    }>(`/api/contractors/batch-wire${qs ? '?' + qs : ''}`);
+  }
+};
+
+// ==========================================
+// STATUTORY COMPLIANCE API
+// ==========================================
+
+export const complianceApi = {
+  getCalendar: (filingType?: string, status?: string) => {
+    const q = new URLSearchParams();
+    if (filingType) q.append('filing_type', filingType);
+    if (status) q.append('status', status);
+    const qs = q.toString();
+    return request<ComplianceCalendarResponse>(`/api/compliance/calendar${qs ? '?' + qs : ''}`);
+  },
+
+  createFiling: (payload: {
+    filing_type: string;
+    period_label: string;
+    due_date: string;
+    statutory_authority: string;
+    amount_payable: number;
+  }) =>
+    request<ComplianceFiling>('/api/compliance/filings', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  markFilingFiled: (filingId: string, payload: {
+    challan_reference: string;
+    bsr_code?: string;
+    cin_number?: string;
+    filed_at?: string;
+  }) =>
+    request<{ message: string; filing: ComplianceFiling; status: string; penalty_assessed: number }>(
+      `/api/compliance/filings/${filingId}/mark-filed`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      }
+    ),
+
+  calculatePenalty: (payload: {
+    filing_type: string;
+    amount_payable: number;
+    due_date: string;
+    proposed_filing_date: string;
+  }) =>
+    request<{
+      days_overdue: number;
+      months_delay: number;
+      penalty_amount: number;
+      interest_amount: number;
+      total_statutory_charge: number;
+      statutory_sections: string;
+      risk_severity: string;
+    }>('/api/compliance/penalty-calculator', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  getForm16: (employeeId: string, assessmentYear: string = '2027-28') =>
+    request<Form16Data>(`/api/compliance/form16/${employeeId}?assessment_year=${encodeURIComponent(assessmentYear)}`),
+
+  getForm24Q: (quarter: string = 'Q2') =>
+    request<{
+      header: any;
+      annexure_i_challans: any[];
+      annexure_ii_deductees: any[];
+      summary: any;
+    }>(`/api/compliance/form24q?quarter=${encodeURIComponent(quarter)}`)
 };

@@ -21,6 +21,10 @@ import { AIAuditorPage } from './pages/AIAuditorPage';
 import { AIAssistantPage } from './pages/AIAssistantPage';
 import { PayslipsReportsPage } from './pages/PayslipsReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { ExpensesClaimsPage } from './pages/ExpensesClaimsPage';
+import { TaxVaultPage } from './pages/TaxVaultPage';
+import { ContractorsPage } from './pages/ContractorsPage';
+import { ComplianceVaultPage } from './pages/ComplianceVaultPage';
 import { api, setApiUserId } from './services/api';
 import { User } from './types';
 import { WifiOff } from 'lucide-react';
@@ -135,7 +139,7 @@ export const App: React.FC = () => {
       const me = await api.getMe();
       setCurrentUser(me);
       // If employee, redirect to dashboard or allowed tabs
-      if (me.role === 'employee' && ['payroll', 'auditor', 'settings'].includes(currentTab)) {
+      if (me.role === 'employee' && ['payroll', 'auditor', 'settings', 'contractors', 'compliance'].includes(currentTab)) {
         setCurrentTab('dashboard');
       }
       // Refresh discrepancies
@@ -220,7 +224,7 @@ export const App: React.FC = () => {
   // 2. CORE SAAS APPLICATION PORTAL VIEW
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+      <div className="min-h-screen bg-[#F5F5F7] flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
         {/* Offline Banner */}
         {!isOnline && (
           <div className="bg-amber-600 text-white text-xs py-1.5 px-4 text-center font-medium flex items-center justify-center gap-2 shrink-0 sticky top-0 z-50">
@@ -263,7 +267,7 @@ export const App: React.FC = () => {
           />
 
           {/* Main Content Area */}
-          <main className="flex-1 overflow-y-auto min-h-[calc(100vh-61px)] bg-slate-50">
+          <main className="flex-1 overflow-y-auto min-h-[calc(100vh-61px)] bg-[#F5F5F7]">
             {currentTab === 'dashboard' && (
               <DashboardPage
                 currentUser={currentUser}
@@ -321,6 +325,34 @@ export const App: React.FC = () => {
 
             {currentTab === 'payslips' && (
               <PayslipsReportsPage currentUser={currentUser} initialView="payslip" />
+            )}
+
+            {currentTab === 'expenses' && (
+              <ExpensesClaimsPage
+                currentUser={currentUser}
+                onNavigateTab={setCurrentTab}
+              />
+            )}
+
+            {currentTab === 'tax_vault' && (
+              <TaxVaultPage
+                currentUser={currentUser}
+                onNavigateTab={setCurrentTab}
+              />
+            )}
+
+            {currentTab === 'contractors' && (
+              <ContractorsPage
+                currentUser={currentUser}
+                onNavigateTab={setCurrentTab}
+              />
+            )}
+
+            {currentTab === 'compliance' && (
+              <ComplianceVaultPage
+                currentUser={currentUser}
+                onNavigateTab={setCurrentTab}
+              />
             )}
 
             {currentTab === 'reports' && (

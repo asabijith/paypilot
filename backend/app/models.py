@@ -371,3 +371,146 @@ class HRWorkflowTask(Base):
     approved_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+
+
+class ExpenseClaim(Base):
+    __tablename__ = "expense_claims"
+    id = Column(String, primary_key=True)
+    company_id = Column(String, ForeignKey("companies.id"), nullable=False)
+    employee_id = Column(String, ForeignKey("employees.id"), nullable=False)
+    employee_name = Column(String, nullable=False)
+    title = Column(String, nullable=False)
+    category = Column(String, nullable=False) # travel, remote_work_internet, client_entertainment, learning_certifications, medical_wellness, general_office
+    amount = Column(Float, nullable=False)
+    currency = Column(String, default="INR")
+    expense_date = Column(Date, default=date.today)
+    status = Column(String, default="submitted") # draft, submitted, approved, rejected, reimbursed
+    tax_treatment = Column(String, default="tax_free_sec10") # tax_free_sec10, taxable_perquisite_sec17
+    receipt_name = Column(String, default="receipt.pdf")
+    merchant_name = Column(String, nullable=False)
+    gstin = Column(String, nullable=True)
+    policy_violation_flag = Column(Boolean, default=False)
+    policy_violation_notes = Column(Text, nullable=True)
+    reimbursement_period_id = Column(String, nullable=True)
+    approved_by = Column(String, nullable=True)
+    approved_at = Column(DateTime, nullable=True)
+    rejection_reason = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class SalaryAdvance(Base):
+    __tablename__ = "salary_advances"
+    id = Column(String, primary_key=True)
+    company_id = Column(String, ForeignKey("companies.id"), nullable=False)
+    employee_id = Column(String, ForeignKey("employees.id"), nullable=False)
+    employee_name = Column(String, nullable=False)
+    amount_requested = Column(Float, nullable=False)
+    amount_approved = Column(Float, default=0.0)
+    reason = Column(Text, nullable=False)
+    tenure_months = Column(Integer, default=1)
+    monthly_emi = Column(Float, default=0.0)
+    amount_recovered = Column(Float, default=0.0)
+    status = Column(String, default="pending") # pending, approved, active_deduction, fully_recovered, rejected
+    applied_date = Column(Date, default=date.today)
+    approved_by = Column(String, nullable=True)
+    approved_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class TaxDeclaration(Base):
+    __tablename__ = "tax_declarations"
+    id = Column(String, primary_key=True)
+    company_id = Column(String, ForeignKey("companies.id"), nullable=False)
+    employee_id = Column(String, ForeignKey("employees.id"), nullable=False)
+    employee_name = Column(String, nullable=False)
+    financial_year = Column(String, default="2026-27")
+    regime_selected = Column(String, default="new") # new, old
+    sec_80c_declared = Column(Float, default=0.0) # EPF, PPF, ELSS, LIC (max 1.5L)
+    sec_80c_approved = Column(Float, default=0.0)
+    sec_80d_health_declared = Column(Float, default=0.0) # Medical insurance (self 25k + parents 50k)
+    sec_80d_health_approved = Column(Float, default=0.0)
+    sec_24b_home_loan_interest_declared = Column(Float, default=0.0) # max 2L
+    sec_24b_home_loan_interest_approved = Column(Float, default=0.0)
+    sec_80ccd_nps_declared = Column(Float, default=0.0) # NPS up to 50k
+    sec_80ccd_nps_approved = Column(Float, default=0.0)
+    hra_annual_rent_declared = Column(Float, default=0.0)
+    hra_annual_rent_approved = Column(Float, default=0.0)
+    landlord_pan = Column(String, nullable=True)
+    landlord_name = Column(String, nullable=True)
+    rental_city_type = Column(String, default="metro") # metro, non_metro
+    other_exemptions_declared = Column(Float, default=0.0)
+    other_exemptions_approved = Column(Float, default=0.0)
+    status = Column(String, default="draft") # draft, submitted, verified, locked
+    verification_notes = Column(Text, nullable=True)
+    verified_by = Column(String, nullable=True)
+    verified_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint('company_id', 'employee_id', 'financial_year', name='uix_company_emp_fy_tax'),
+    )
+
+class Contractor(Base):
+    __tablename__ = "contractors"
+    id = Column(String, primary_key=True)
+    company_id = Column(String, ForeignKey("companies.id"), nullable=False)
+    contractor_code = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    phone = Column(String, default="+91 9876543210")
+    country = Column(String, default="India")
+    currency = Column(String, default="INR") # INR, USD, EUR, GBP, AED, SGD
+    contractor_type = Column(String, default="individual") # individual, company
+    service_type = Column(String, default="software_engineering") # software_engineering, ui_ux_design, cloud_devops, legal_advisory, content_marketing
+    pan_or_tax_id = Column(String, default="ABCDE1234F")
+    gstin = Column(String, nullable=True)
+    w8ben_status = Column(String, default="not_applicable") # not_applicable, submitted, verified
+    withholding_section = Column(String, default="194J") # 194J_10_percent, 194J_2_percent, 194C_1_percent, 194C_2_percent, non_resident_wire
+    withholding_rate_pct = Column(Float, default=10.0)
+    rate_per_hour_or_month = Column(Float, default=0.0)
+    rate_type = Column(String, default="fixed_monthly") # hourly, fixed_monthly, milestone
+    bank_name = Column(String, default="HDFC Bank")
+    bank_account = Column(String, default="50100987654321")
+    ifsc_or_swift = Column(String, default="HDFC0001234")
+    status = Column(String, default="active") # active, inactive
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint('company_id', 'contractor_code', name='uix_company_contractor_code'),
+    )
+
+class ContractorInvoice(Base):
+    __tablename__ = "contractor_invoices"
+    id = Column(String, primary_key=True)
+    company_id = Column(String, ForeignKey("companies.id"), nullable=False)
+    contractor_id = Column(String, ForeignKey("contractors.id"), nullable=False)
+    invoice_number = Column(String, nullable=False)
+    invoice_date = Column(Date, default=date.today)
+    due_date = Column(Date, default=date.today)
+    currency = Column(String, default="INR")
+    subtotal_amount = Column(Float, nullable=False)
+    gst_amount = Column(Float, default=0.0)
+    tds_withheld_amount = Column(Float, default=0.0)
+    net_payable_amount = Column(Float, nullable=False)
+    fx_rate_to_inr = Column(Float, default=1.0)
+    net_inr_equivalent = Column(Float, nullable=False)
+    description = Column(Text, nullable=False)
+    status = Column(String, default="pending_approval") # draft, pending_approval, approved, paid, cancelled
+    paid_at = Column(DateTime, nullable=True)
+    payment_reference = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class ComplianceFiling(Base):
+    __tablename__ = "compliance_filings"
+    id = Column(String, primary_key=True)
+    company_id = Column(String, ForeignKey("companies.id"), nullable=False)
+    filing_type = Column(String, nullable=False) # epf_ecr, esic_challan, tds_challan_281, pt_return, form_24q
+    period_label = Column(String, nullable=False) # e.g. "October 2026", "Q2 FY2026-27"
+    due_date = Column(Date, nullable=False)
+    statutory_authority = Column(String, nullable=False) # EPFO India, ESIC Corporation, Income Tax Dept, Commercial Taxes
+    amount_payable = Column(Float, default=0.0)
+    status = Column(String, default="pending") # pending, filed_on_time, delayed_filed, overdue
+    challan_reference = Column(String, nullable=True)
+    bsr_code = Column(String, nullable=True)
+    cin_number = Column(String, nullable=True)
+    filed_at = Column(DateTime, nullable=True)
+    penalty_computed = Column(Float, default=0.0)
+    created_at = Column(DateTime, default=datetime.utcnow)

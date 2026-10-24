@@ -158,3 +158,4 @@ tests/test_tenant_isolation.py::test_tenant_isolation_payroll_period PASSED [100
 ---
 
 &copy; 2026 PayPilot AI Technologies. All rights reserved.
+"# paypilot" 
